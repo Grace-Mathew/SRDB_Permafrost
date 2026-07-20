@@ -1,0 +1,30 @@
+---
+title: "srdb"
+author: "GM"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Analysis - GM 2026
+
+# Load packages
+library(dplyr)
+library(ggplot2)
+
+# Read Data
+SRDB_Data <- read.csv("srdb-data.csv")
+print(SRDB_Data)
+
+# Select only columns of interest
+df <- SRDB_Data %>% select("Study_midyear", "Longitude", "Latitude", "Manipulation", "Rs_annual", "Rh_annual", "MAT", "MAP", "Biome", "Ecosystem_type")
+
+# Items from BBL email -- summary, etc.
+ncol(df)
+nrow(df)
+plot(df$Study_midyear, df$Rs_annual)
+# Make a map
+
+
