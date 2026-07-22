@@ -68,3 +68,6 @@ ggplot(world)+
   geom_sf()+
   geom_point(data = SRDB_filtered, aes(x=Longitude, y=Latitude, colour = MAP_wc), size = 1)+
   scale_color_viridis_c()
+
+permafrost_map <- terra::rast("NCSCDv2_Circumpolar_raster_1deg/NCSCDv2_Circumpolar_WGS84_pfregion_extent_1deg.tif")
+plot(permafrost_map)
