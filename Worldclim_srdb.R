@@ -68,3 +68,6 @@ ggplot(world)+
   geom_sf()+
   geom_point(data = SRDB_filtered, aes(x=Longitude, y=Latitude, colour = MAP_wc), size = 1)+
   scale_color_viridis_c()
+
+head(world_coords)
+
