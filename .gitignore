@@ -48,3 +48,4 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 /worldclim_data
+/NCSCDv2_Circumpolar_raster_1deg.zip
