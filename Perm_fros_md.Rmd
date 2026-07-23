@@ -71,6 +71,7 @@ ggplot(world)+
 # Precip Data
 prec_data <- worldclim_global(var = "prec", res = 10, path = "raw_data/worldclim_data/")
 prec_values <- terra::extract(prec_data, coords)
+SRDB_filtered$MAP_wc <- rowSums(temp_values[, -1], na.rm = TRUE)
 print(prec_values)
 head(SRDB_filtered)
 
