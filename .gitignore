@@ -49,3 +49,6 @@ po/*~
 rsconnect/
 /worldclim_data
 /NCSCDv2_Circumpolar_raster_1deg.zip
+
+*.DS_Store
+
