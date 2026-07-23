@@ -69,7 +69,7 @@ ggplot(world)+
 
 ```{r echo=FALSE, warning=FALSE}
 # Precip Data
-prec_data <- worldclim_global(var = "prec", res = 10, path = "worldclim_data/")
+prec_data <- worldclim_global(var = "prec", res = 10, path = "raw_data/worldclim_data/")
 prec_values <- terra::extract(prec_data, coords)
 print(prec_values)
 head(SRDB_filtered)
@@ -91,6 +91,9 @@ head(world_coords)
 
 ```{r echo=FALSE, warning=FALSE}
 # Reading in Permafrost Data
-permafrost_map <- terra::rast("NCSCDv2_Circumpolar_raster_1deg/NCSCDv2_Circumpolar_WGS84_pfregion_extent_1deg.tif")
+permafrost_map <- terra::rast("raw_data/NCSCDv2_Circumpolar_raster_1deg/NCSCDv2_Circumpolar_WGS84_pfregion_extent_1deg.tif")
 plot(permafrost_map)
 ```
+
+```{r echo=FALSE}
+permafrost_vals <- terra::extract(permafrost_map, coords)
