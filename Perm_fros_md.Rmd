@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r include=FALSE}
 # Load Packages
 library(geodata)
 library(terra)
@@ -21,9 +22,14 @@ library(readr)
 library(lubridate)
 library(arrow)
 library(DT)
+``` 
 
+```{r echo=FALSE}
 SRDB_Data <- read.csv("srdb-data.csv")
 
+```
+
+```{r echo=FALSE}
 # We need longitude and latitude data to do anything, so filter for that
 SRDB_Data |>
   as_tibble() |>
@@ -37,10 +43,11 @@ print(SRDB_Data)
 temp_data <- worldclim_global(var = "tavg", res = 10, path = "worldclim_data/")
 temp_values <- terra::extract(temp_data, coords)
 print(temp_values)
+```
 
+```{r echo=FALSE, warning=FALSE}
 # Now, we want to compute MAT - mean of the 12 data columns
 SRDB_filtered$MAT_wc <- rowMeans(temp_values[, -1], na.rm = TRUE)
-print(MAT)
 head(SRDB_filtered)
 
 
@@ -48,8 +55,9 @@ head(SRDB_filtered)
 ggplot(data = SRDB_filtered, aes(x = MAT, y = MAT_wc, color = Latitude))+
   geom_point(size = 2)+
   geom_abline() 
+```
 
-
+```{r echo=FALSE, warning=FALSE}
 # World Clim data on world map
 world_coords <- map_data("world")
 world <- ne_countries()
@@ -57,13 +65,13 @@ ggplot(world)+
   geom_sf()+
   geom_point(data = SRDB_filtered, aes(x=Longitude, y=Latitude, colour = MAT_wc), size = 1)+
   scale_color_viridis_c()
+```
 
+```{r echo=FALSE, warning=FALSE}
 # Precip Data
 prec_data <- worldclim_global(var = "prec", res = 10, path = "worldclim_data/")
 prec_values <- terra::extract(prec_data, coords)
 print(prec_values)
-SRDB_filtered$MAP_wc <- rowSums(prec_values[, -1], na.rm = TRUE)
-print(MAP_wc)
 head(SRDB_filtered)
 
 # MAP v MAP_wc plotted
@@ -77,10 +85,12 @@ ggplot(world)+
   geom_sf()+
   geom_point(data = SRDB_filtered, aes(x=Longitude, y=Latitude, colour = MAP_wc), size = 1)+
   scale_color_viridis_c()
-```{r}
-```
-
-
-```{r}
-```
   
+head(world_coords)
+```
+
+```{r echo=FALSE, warning=FALSE}
+# Reading in Permafrost Data
+permafrost_map <- terra::rast("NCSCDv2_Circumpolar_raster_1deg/NCSCDv2_Circumpolar_WGS84_pfregion_extent_1deg.tif")
+plot(permafrost_map)
+```
