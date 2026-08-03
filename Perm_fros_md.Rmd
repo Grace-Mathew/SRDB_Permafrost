@@ -97,8 +97,16 @@ head(world_coords)
 permafrost_map <- terra::rast("raw_data/NCSCDv2_Circumpolar_raster_1deg/NCSCDv2_Circumpolar_raster_1deg/NCSCDv2_Circumpolar_WGS84_pfregion_extent_1deg.tif")
 plot(permafrost_map)
 ```
+
 ```{r echo=FALSE, warning=FALSE}
 ggplot()+
-  geom_spatraster(data = permafrost_map, aes())+
-  geom_point(data = SRDB_filtered, aes(x = Longitude, y = Latitude, colour = Rs_annual), size = 2)
+  geom_spatraster(data = permafrost_map, aes(fill = OID))+
+geom_point(data = SRDB_filtered, aes(x = Longitude, y = Latitude, colour = Rs_annual), size = 2)
+```
+
+```{r echo=FALSE, warning=FALSE}
+gelisol <- terra::rast("raw_data/NCSCDv2_Circumpolar_raster_1deg/NCSCDv2_Circumpolar_raster_1deg/NCSCDv2_Circumpolar_WGS84_gelisol_pct_1deg.tif")
+SRDB_points <- vect(SRDB_filtered, geom = c("Longitude", "Latitude"), crs = crs(gelisol))
+gelisol_extract <- terra::extract(gelisol, SRDB_points)
+SRDB_filtered$gelisol <- gelisol_extract[ , 2]
 ```
