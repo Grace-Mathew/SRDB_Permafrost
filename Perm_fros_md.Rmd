@@ -110,13 +110,17 @@ gelisol <- terra::rast("raw_data/NCSCDv2_Circumpolar_raster_1deg/NCSCDv2_Circump
 SRDB_points <- vect(SRDB_filtered, geom = c("Longitude", "Latitude"), crs = crs(gelisol))
 gelisol_extract <- terra::extract(gelisol, SRDB_points)
 SRDB_filtered$gelisol <- as.numeric(gelisol_extract[ , 2])/100
+gelisol_filtered <- SRDB_filtered[!is.na(SRDB_filtered$gelisol), ]
 ```
 
 ```{r echo=FALSE, warning=FALSE}
-SRDB_filtered <- SRDB_filtered[is.na(SRDB_filtered$gelisol), ]
 ggplot(world)+
   geom_sf()+
 geom_point(data = SRDB_filtered, aes(x = Longitude, y = Latitude, colour = gelisol), size = 1)+
   scale_color_viridis_c()
 ```
-
+```{r echo=FALSE}
+mod <- lm(formula = Rs_annual~MAT_wc+gelisol, data = SRDB_filtered)
+summary(mod)
+plot(mod)
+```
