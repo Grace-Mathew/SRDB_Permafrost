@@ -120,7 +120,7 @@ geom_point(data = SRDB_filtered, aes(x = Longitude, y = Latitude, colour = gelis
   scale_color_viridis_c()
 ```
 ```{r echo=FALSE}
-mod <- lm(formula = Rs_annual~MAT_wc+gelisol, data = SRDB_filtered)
+mod <- lm(formula = Rs_annual~MAT_wc+SRDB_filtered$gelisol, data = SRDB_filtered)
 summary(mod)
 plot(mod)
 ```
