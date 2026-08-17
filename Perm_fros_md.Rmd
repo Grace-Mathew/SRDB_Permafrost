@@ -21,6 +21,11 @@ library(arrow)
 library(DT)
 library(tidyterra)
 library(car)
+library(styler)
+```
+
+```{r echo=TRUE}
+styler::style_dir()
 ```
 
 ```{r echo=TRUE}
@@ -39,11 +44,11 @@ SRDB_Data |>
 
 ```{r echo=FALSE}
 coords <- SRDB_filtered %>% select(Longitude, Latitude)
-print(SRDB_Data)
+head(SRDB_Data)
 # Start simple and small, with 10 degree resolutions (smallest data)
 temp_data <- worldclim_global(var = "tavg", res = 10, path = "raw_data/worldclim_data/")
 temp_values <- terra::extract(temp_data, coords)
-print(temp_values)
+head(temp_values)
 ```
 
 ```{r echo=FALSE, warning=FALSE}
