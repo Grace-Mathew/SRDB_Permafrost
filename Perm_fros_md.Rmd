@@ -1,4 +1,6 @@
 
+# Grace Mathew
+# Summer internship 2026
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -18,6 +20,12 @@ library(lubridate)
 library(arrow)
 library(DT)
 library(tidyterra)
+library(car)
+library(styler)
+```
+
+```{r echo=TRUE}
+styler::style_dir()
 ```
 
 ```{r echo=TRUE}
@@ -32,13 +40,15 @@ SRDB_Data |>
   select(Longitude, Latitude, MAT, Rs_annual, Record_number, MAP) |>
   filter(!is.na(Longitude), !is.na(Latitude)) ->
   SRDB_filtered
+```
 
+```{r echo=FALSE}
 coords <- SRDB_filtered %>% select(Longitude, Latitude)
-print(SRDB_Data)
+head(SRDB_Data)
 # Start simple and small, with 10 degree resolutions (smallest data)
 temp_data <- worldclim_global(var = "tavg", res = 10, path = "raw_data/worldclim_data/")
 temp_values <- terra::extract(temp_data, coords)
-print(temp_values)
+head(temp_values)
 ```
 
 ```{r echo=FALSE, warning=FALSE}
@@ -51,6 +61,14 @@ head(SRDB_filtered)
 ggplot(data = SRDB_filtered, aes(x = MAT, y = MAT_wc, color = Latitude))+
   geom_point(size = 2)+
   geom_abline() 
+```
+```{r echo=FALSE, warning=FALSE}
+world_coords <- map_data("world")
+world <- ne_countries()
+ggplot(world)+
+  geom_sf()+
+  geom_point(data = SRDB_filtered, aes(x=Longitude, y=Latitude, colour = Rs_annual), size = 1)+
+  scale_color_viridis_c(limits = c(0,4000), oob = scales::squish)
 ```
 
 ```{r echo=FALSE, warning=FALSE}
@@ -67,7 +85,8 @@ ggplot(world)+
 # Precip Data
 prec_data <- worldclim_global(var = "prec", res = 10, path = "raw_data/worldclim_data/")
 prec_values <- terra::extract(prec_data, coords)
-SRDB_filtered$MAP_wc <- rowSums(temp_values[, -1], na.rm = TRUE)
+# Monthly val converted to mm
+SRDB_filtered$MAP_wc <- rowSums(prec_values[, -1], na.rm = TRUE)
 print(prec_values)
 head(SRDB_filtered)
 ```
@@ -98,7 +117,8 @@ plot(permafrost_map)
 # Plotting SRDB on Permafrost map
 ggplot()+
   geom_spatraster(data = permafrost_map, aes(fill = OID))+
-geom_point(data = SRDB_filtered, aes(x = Longitude, y = Latitude, colour = Rs_annual), size = 2)
+geom_point(data = SRDB_filtered, aes(x = Longitude, y = Latitude, colour = Rs_annual), size = 2)+
+ scale_color_viridis_c(limits = c(0,4000), oob = scales::squish)
 ```
 
 ```{r echo=FALSE, warning=FALSE}
@@ -106,5 +126,25 @@ geom_point(data = SRDB_filtered, aes(x = Longitude, y = Latitude, colour = Rs_an
 gelisol <- terra::rast("raw_data/NCSCDv2_Circumpolar_raster_1deg/NCSCDv2_Circumpolar_raster_1deg/NCSCDv2_Circumpolar_WGS84_gelisol_pct_1deg.tif")
 SRDB_points <- vect(SRDB_filtered, geom = c("Longitude", "Latitude"), crs = crs(gelisol))
 gelisol_extract <- terra::extract(gelisol, SRDB_points)
-SRDB_filtered$gelisol <- gelisol_extract[ , 2]
+SRDB_filtered$gelisol <- as.numeric(gelisol_extract[ , 2])/100
+gelisol_filtered <- SRDB_filtered[!is.na(SRDB_filtered$gelisol), ]
+```
+
+```{r echo=FALSE, warning=FALSE}
+ggplot(world)+
+  geom_sf()+
+geom_point(data = SRDB_filtered, aes(x = Longitude, y = Latitude, colour = gelisol), size = 1)+
+  scale_color_viridis_c()
+```
+
+Model testing for gelisol effect:
+
+```{r echo=FALSE}
+mod <- lm(formula = Rs_annual~MAT_wc+gelisol+MAP_wc, data = SRDB_filtered)
+plot(mod)
+summary(mod)
+
+# We want to generate "Type III" sum of squares for our model
+# that is, what is the effect of each variable after ALL OF THE OTHERS?
+car::Anova(mod, type = "III")
 ```
